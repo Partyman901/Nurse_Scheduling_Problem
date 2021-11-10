@@ -205,6 +205,7 @@ def doNurseOptimization(prefs, SearchAgents, Max_iter, optimizer_name='WOA'):
 
   num_days = len(prefs[0])
   dim = NUM_SHIFTS * num_days
+  print("DIM = ", dim)
   #SearchAgents_no = 30    # edit me
   #Max_iter = 30           # edit me
 
