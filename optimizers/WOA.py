@@ -7,7 +7,7 @@ Created on Mon May 16 14:19:49 2016
 import random
 import numpy
 import math
-# from solution import solution
+from solution import solution
 import time
 
 
@@ -15,31 +15,24 @@ def WOA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
 
     # dim=30
     # SearchAgents_no=50
-    # lb=-100 lower bound
-    # ub=100 upper bound
+    # lb=-100
+    # ub=100
     # Max_iter=500
     if not isinstance(lb, list):
         lb = [lb] * dim
-        #print('lb:', lb)
     if not isinstance(ub, list):
         ub = [ub] * dim
-        #print('ub:', ub)
 
     # initialize position vector and score for the leader
     Leader_pos = numpy.zeros(dim)
-    print("LEADER_POS = ", Leader_pos)
     Leader_score = float("inf")  # change this to -inf for maximization problems
 
     # Initialize the positions of search agents
-
     Positions = numpy.zeros((SearchAgents_no, dim))
     for i in range(dim):
-        # print("UB =", ub, "LB = ", lb)
         Positions[:, i] = (
             numpy.random.uniform(0, 1, SearchAgents_no) * (ub[i] - lb[i]) + lb[i]
         )
-    
-    print('positions:', Positions)
 
     # Initialize convergence
     convergence_curve = numpy.zeros(Max_iter)
@@ -47,7 +40,7 @@ def WOA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
     ############################
     s = solution()
 
-    #print('WOA is optimizing  "' + objf.__name__ + '"')
+    print('WOA is optimizing  "' + objf.__name__ + '"')
 
     timerStart = time.time()
     s.startTime = time.strftime("%Y-%m-%d-%H-%M-%S")
@@ -67,6 +60,7 @@ def WOA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
 
             # Calculate objective function for each search agent
             fitness = objf(Positions[i, :])
+
             # Update the leader
             if fitness < Leader_score:  # Change this to > for maximization problem
                 Leader_score = fitness
@@ -120,13 +114,10 @@ def WOA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
                     )
 
         convergence_curve[t] = Leader_score
-        #comments out the print statement on each iteration (print statements cost performance)
-        '''
         if t % 1 == 0:
             print(
                 ["At iteration " + str(t) + " the best fitness is " + str(Leader_score)]
             )
-        '''
         t = t + 1
 
     timerEnd = time.time()
