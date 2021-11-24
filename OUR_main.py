@@ -35,14 +35,13 @@ def hardConstraints(nurse_num, nurse_shift):
             3: Cannot work more than 6 days a week
             """
     global WORKING_SCHEDULE
-
-    # maybe use set here with pairs like 2nd hard constraint
     paired_arrays_within_big_array = []
+    # maybe use set here with pairs like 2nd hard constraint
     for index, shift in enumerate(WORKING_SCHEDULE):
         if index % 2 == 0:
             paired_arrays_within_big_array.append([])
         paired_arrays_within_big_array[-1].append(shift)
-
+    print("PAIRED ARRAYS =", paired_arrays_within_big_array)
 
     def hardConstraint1():
         """ Nurses cannot work both shifts in a day """
@@ -79,18 +78,22 @@ def hardConstraints(nurse_num, nurse_shift):
                 return False
     
     # Hard Constraint Checks
+    violations = 0
     constraint_check1 = hardConstraint1()
     if constraint_check1 == False:
-        WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
+        violations += 50
+        # WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
 
     constraint_check2 = hardConstraint2()
     if constraint_check2 == False:
-        WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
+        violations += 50
+        # WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
 
     constraint_check3 = hardConstraint3()
     if constraint_check3 == False:
-        WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
-    return WORKING_SCHEDULE
+        violations += 50
+        # WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
+    return violations
 
 
 
@@ -103,16 +106,26 @@ def softConstraints(nurse_prefs):
         violations += nurse_prefs[nurse][i]
     return violations
 
+def convert_to_matrix(arr, stride):
+    ans = []
+    for index, element in enumerate(arr):
+        if index % stride == 0:
+            ans.append([])
+        ans[-1].append(element)
+    return ans
 
 def its_whale_time(nurse_num, nurse_shifts):
-    def objf(): 
+    def objf(positions): 
         # returns violation score
-        createSchedule(nurse_num, nurse_shifts) # creates initial schedule
-        hardConstraints(nurse_num, nurse_shifts)
-
-        sc = softConstraints(createPrefs(nurse_num, nurse_shifts))
-        return sc # returns violation score
-
+        # createSchedule(nurse_num, nurse_shifts) # creates initial schedule
+        # hardConstraints(nurse_num, nurse_shifts)
+        print("POSITIONS", positions)
+        new_positions = convert_to_matrix(positions, 2)
+        sc = softConstraints(new_positions)
+        hc = hardConstraints(nurse_num, nurse_shifts)
+        total = sc + hc
+        return total # returns violation score
+    pref = createPrefs(nurse_num, nurse_shifts)
     search_agents = 100
     max_iter = 40
     test_answer = woa.WOA(objf, 1, nurse_num, nurse_shifts, search_agents, max_iter)
@@ -120,7 +133,9 @@ def its_whale_time(nurse_num, nurse_shifts):
 
 
 def main():
+    createSchedule(49, 14)
     w = its_whale_time(49, 14)
+
     print("BESTINDIVID :", w.bestIndividual) #Leader position -> only changes when fitness is less than current Leader score
     print("CONVERGENT :", w.convergence) #Convergence curve -> fitness number (violation number)
     print("BEST: ", w.best) # The best value out of all the iterations
