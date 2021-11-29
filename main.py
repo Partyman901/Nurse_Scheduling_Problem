@@ -1,8 +1,6 @@
 import optimizers.WOA as woa
 import optimizers.GA as ga
 
-
-from pprint import pprint
 import math
 import itertools
 import time

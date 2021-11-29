@@ -1,5 +1,5 @@
 import optimizers.WOA as woa
-
+from pprint import pprint
 import random
 import numpy as np
 
@@ -35,13 +35,13 @@ def hardConstraints(nurse_num, nurse_shift):
             3: Cannot work more than 6 days a week
             """
     global WORKING_SCHEDULE
-    paired_arrays_within_big_array = []
+
     # maybe use set here with pairs like 2nd hard constraint
+    paired_arrays_within_big_array = []
     for index, shift in enumerate(WORKING_SCHEDULE):
         if index % 2 == 0:
             paired_arrays_within_big_array.append([])
         paired_arrays_within_big_array[-1].append(shift)
-    print("PAIRED ARRAYS =", paired_arrays_within_big_array)
 
     def hardConstraint1():
         """ Nurses cannot work both shifts in a day """
@@ -53,8 +53,6 @@ def hardConstraints(nurse_num, nurse_shift):
                 return False
             index1 += 2
             index2 += 2
-
-
 
     def hardConstraint2():
         """"" Nurses cannot work 5 days in a row """
@@ -70,7 +68,6 @@ def hardConstraints(nurse_num, nurse_shift):
                     return False
                 day += 1
 
-
     def hardConstraint3():
         """ Nurses cannot work more than 6 days a week  """
         for nurse in range(nurse_num):
@@ -78,22 +75,18 @@ def hardConstraints(nurse_num, nurse_shift):
                 return False
     
     # Hard Constraint Checks
-    violations = 0
     constraint_check1 = hardConstraint1()
     if constraint_check1 == False:
-        violations += 50
-        # WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
+        WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
 
     constraint_check2 = hardConstraint2()
     if constraint_check2 == False:
-        violations += 50
-        # WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
+        WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
 
     constraint_check3 = hardConstraint3()
     if constraint_check3 == False:
-        violations += 50
-        # WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
-    return violations
+        WORKING_SCHEDULE = createSchedule(nurse_num, nurse_shift)
+    return WORKING_SCHEDULE
 
 
 
@@ -106,38 +99,26 @@ def softConstraints(nurse_prefs):
         violations += nurse_prefs[nurse][i]
     return violations
 
-def convert_to_matrix(arr, stride):
-    ans = []
-    for index, element in enumerate(arr):
-        if index % stride == 0:
-            ans.append([])
-        ans[-1].append(element)
-    return ans
 
 def its_whale_time(nurse_num, nurse_shifts):
-    def objf(positions): 
-        # returns violation score
-        # createSchedule(nurse_num, nurse_shifts) # creates initial schedule
-        # hardConstraints(nurse_num, nurse_shifts)
-        print("POSITIONS", positions)
-        new_positions = convert_to_matrix(positions, 2)
-        sc = softConstraints(new_positions)
-        hc = hardConstraints(nurse_num, nurse_shifts)
-        total = sc + hc
-        return total # returns violation score
-    pref = createPrefs(nurse_num, nurse_shifts)
-    search_agents = 100
-    max_iter = 40
+    def objf(): 
+        createSchedule(nurse_num, nurse_shifts) # creates new sschedule
+        hardConstraints(nurse_num, nurse_shifts)
+        sc = softConstraints(prefs)
+        return sc # returns violation score
+    prefs = createPrefs(nurse_num, nurse_shifts)
+    print("NURSE PREFERENCES WERE :", prefs)
+    search_agents = 70
+    max_iter = 1000
     test_answer = woa.WOA(objf, 1, nurse_num, nurse_shifts, search_agents, max_iter)
-    return test_answer
+    return prefs, test_answer
 
 
 def main():
-    createSchedule(49, 14)
-    w = its_whale_time(49, 14)
-
+    prefs, w = its_whale_time(99, 14)
+    # print("NURSE PREFERENCES WERE :", prefs)
+    print("EXECUTION TIME", w.executionTime)
     print("BESTINDIVID :", w.bestIndividual) #Leader position -> only changes when fitness is less than current Leader score
     print("CONVERGENT :", w.convergence) #Convergence curve -> fitness number (violation number)
-    print("BEST: ", w.best) # The best value out of all the iterations
-
+    print("BEST : ", w.best) # The best value out of all the iterations
 main()
