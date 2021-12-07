@@ -33,6 +33,7 @@ def WOA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
         Positions[:, i] = (
             numpy.random.uniform(0, 1, SearchAgents_no) * (ub[i] - lb[i]) + lb[i]
         )
+        # print("Positions[:,i]", Positions[:,i])
 
     # Initialize convergence
     convergence_curve = numpy.zeros(Max_iter)
@@ -58,9 +59,10 @@ def WOA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
             for j in range(dim):
                 Positions[i, j] = numpy.clip(Positions[i, j], lb[j], ub[j])
 
-            # Calculate objective function for each search agent
-            fitness = objf(Positions[i, :])
 
+            # Calculate objective function for each search agent
+            # fitness = objf(Positions[i, :])
+            fitness = objf()
             # Update the leader
             if fitness < Leader_score:  # Change this to > for maximization problem
                 Leader_score = fitness
@@ -114,10 +116,10 @@ def WOA(objf, lb, ub, dim, SearchAgents_no, Max_iter):
                     )
 
         convergence_curve[t] = Leader_score
-        if t % 1 == 0:
-            print(
-                ["At iteration " + str(t) + " the best fitness is " + str(Leader_score)]
-            )
+        # if t % 1 == 0:
+        #     print(
+        #         ["At iteration " + str(t) + " the best fitness is " + str(Leader_score)]
+        #     )
         t = t + 1
 
     timerEnd = time.time()
